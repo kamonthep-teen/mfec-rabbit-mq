@@ -6,34 +6,26 @@ let MQ_CLOUDAMQP_URL =
 //api sending message
 async function sending(req, res) {
     try {
-        let i = 1
-        do {
-            await sendingAmqplib(i)
-            i++
-        } while (i !== 0)
-
-        res.status(200).json({
-            status: 200,
-            message: 'ok',
+        // const connection = await rabbit.connect('amqp://localhost:5672')
+        const connection = await rabbit.connect(MQ_CLOUDAMQP_URL, function (err, conn) {
+            if (err) {
+                console.log('🚀 ~ file: index.controller.js ~ line 56 ~ sendingAmqplib ~ err', err)
+            }
+            conn.on('error', function (err) {
+                if (err.message !== 'Connection closing') {
+                    console.log('🚀 ~ file: index.controller.js ~ line 64 ~ err', err.message)
+                }
+            })
         })
-    } catch (error) {
-        console.error(error)
-        res.status(400).json({
-            status: 400,
-            message: error,
-        })
-    }
-}
-
-//api receive message
-async function receive(req, res) {
-    try {
+        const channel = await connection.createChannel()
         let i = 1
 
         do {
-            await receiveAmqplib(i)
+            await channel.assertQueue('user')
+            await sendingAmqplib(channel, i)
             i++
         } while (i !== 0)
+        // } while (i < 1)
 
         res.status(200).json({
             status: 200,
@@ -49,22 +41,8 @@ async function receive(req, res) {
 }
 
 // send message to amqplib
-async function sendingAmqplib(i) {
+async function sendingAmqplib(channel, i) {
     try {
-        const connection = await rabbit.connect(MQ_CLOUDAMQP_URL, function (err, conn) {
-            if (err) {
-                console.log('🚀 ~ file: index.controller.js ~ line 56 ~ sendingAmqplib ~ err', err)
-            }
-            conn.on('error', function (err) {
-                if (err.message !== 'Connection closing') {
-                    console.log('🚀 ~ file: index.controller.js ~ line 64 ~ err', err.message)
-                }
-            })
-        })
-        // const connection = await rabbit.connect('amqp://localhost:5672')
-        const channel = await connection.createChannel()
-        await channel.assertQueue('user')
-
         let data = {
             firstname: faker.name.firstName(),
             lastname: faker.name.lastName(),
@@ -85,9 +63,10 @@ async function sendingAmqplib(i) {
     }
 }
 
-// acknowledge message from amqplib
-async function receiveAmqplib(i) {
+//api receive message
+async function receive(req, res) {
     try {
+        // const connection = await rabbit.connect('amqp://localhost:5672')
         const connection = await rabbit.connect(MQ_CLOUDAMQP_URL, function (err, conn) {
             if (err) {
                 console.log('🚀 ~ file: index.controller.js ~ line 56 ~ sendingAmqplib ~ err', err)
@@ -98,10 +77,31 @@ async function receiveAmqplib(i) {
                 }
             })
         })
-        // const connection = await rabbit.connect('amqp://localhost:5672')
         const channel = await connection.createChannel()
-        await channel.assertQueue('user')
+        let i = 1
 
+        do {
+            await channel.assertQueue('user')
+            await receiveAmqplib(channel, i)
+            i++
+        } while (i < 10)
+
+        res.status(200).json({
+            status: 200,
+            message: 'ok',
+        })
+    } catch (error) {
+        console.error(error)
+        res.status(400).json({
+            status: 400,
+            message: error,
+        })
+    }
+}
+
+// acknowledge message from amqplib
+async function receiveAmqplib(channel, i) {
+    try {
         setTimeout(() => {
             channel.consume('user', (message) => {
                 // console.log(message.content.toString())
