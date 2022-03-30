@@ -1,0 +1,1 @@
+# mfec-rabbit-mq
