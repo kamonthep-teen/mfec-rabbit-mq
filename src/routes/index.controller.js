@@ -1,22 +1,23 @@
 const rabbit = require('amqplib')
 const { faker } = require('@faker-js/faker')
 
-let MQ_CLOUDAMQP_URL =
-    'amqp://oxixpawx:R7LLCXlKmE57-Ph4E7y_NsPYE-BjpILc@frosty-teal-greyhound.rmq2.cloudamqp.com/oxixpawx'
 //api sending message
 async function sending(req, res) {
     try {
         // const connection = await rabbit.connect('amqp://localhost:5672')
-        const connection = await rabbit.connect(MQ_CLOUDAMQP_URL, function (err, conn) {
-            if (err) {
-                console.log('🚀 ~ file: index.controller.js ~ line 56 ~ sendingAmqplib ~ err', err)
-            }
-            conn.on('error', function (err) {
-                if (err.message !== 'Connection closing') {
-                    console.log('🚀 ~ file: index.controller.js ~ line 64 ~ err', err.message)
+        const connection = await rabbit.connect(
+            `amqp://${process.env.MQ_CLOUDAMQP_USERNAME}:${process.env.MQ_CLOUDAMQP_PASSWORD}@${process.env.MQ_CLOUDAMQP_URL}/${process.env.MQ_CLOUDAMQP_USERNAME}`,
+            function (err, conn) {
+                if (err) {
+                    console.log('🚀 ~ file: index.controller.js ~ line 56 ~ sendingAmqplib ~ err', err)
                 }
-            })
-        })
+                conn.on('error', function (err) {
+                    if (err.message !== 'Connection closing') {
+                        console.log('🚀 ~ file: index.controller.js ~ line 64 ~ err', err.message)
+                    }
+                })
+            }
+        )
         const channel = await connection.createChannel()
         let i = 1
 
@@ -67,16 +68,19 @@ async function sendingAmqplib(channel, i) {
 async function receive(req, res) {
     try {
         // const connection = await rabbit.connect('amqp://localhost:5672')
-        const connection = await rabbit.connect(MQ_CLOUDAMQP_URL, function (err, conn) {
-            if (err) {
-                console.log('🚀 ~ file: index.controller.js ~ line 56 ~ sendingAmqplib ~ err', err)
-            }
-            conn.on('error', function (err) {
-                if (err.message !== 'Connection closing') {
-                    console.log('🚀 ~ file: index.controller.js ~ line 64 ~ err', err.message)
+        const connection = await rabbit.connect(
+            `amqp://${process.env.MQ_CLOUDAMQP_USERNAME}:${process.env.MQ_CLOUDAMQP_PASSWORD}@${process.env.MQ_CLOUDAMQP_URL}/${process.env.MQ_CLOUDAMQP_USERNAME}`,
+            function (err, conn) {
+                if (err) {
+                    console.log('🚀 ~ file: index.controller.js ~ line 56 ~ sendingAmqplib ~ err', err)
                 }
-            })
-        })
+                conn.on('error', function (err) {
+                    if (err.message !== 'Connection closing') {
+                        console.log('🚀 ~ file: index.controller.js ~ line 64 ~ err', err.message)
+                    }
+                })
+            }
+        )
         const channel = await connection.createChannel()
         let i = 1
 
