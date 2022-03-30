@@ -65,9 +65,9 @@ async function sendingAmqplib(i) {
         setTimeout(() => {
             channel.sendToQueue('user', Buffer.from(JSON.stringify(data)))
             // resolve('Job sent successfully')
+            console.log(`Job sent successfully ${i}`)
         }, 10)
         // })
-        console.log(`Job sent successfully ${i}`)
     } catch (error) {
         console.error(error)
     }
