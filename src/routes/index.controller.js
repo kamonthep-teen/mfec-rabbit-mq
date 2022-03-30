@@ -84,7 +84,7 @@ async function receive(req, res) {
             await channel.assertQueue('user')
             await receiveAmqplib(channel, i)
             i++
-        } while (i < 10)
+        } while (i !== 0)
 
         res.status(200).json({
             status: 200,
@@ -108,7 +108,7 @@ async function receiveAmqplib(channel, i) {
                 channel.ack(message)
             })
             console.log(i + 'Waiting for message...')
-        }, 1000)
+        }, i * 1000)
     } catch (error) {
         console.error(error)
     }
