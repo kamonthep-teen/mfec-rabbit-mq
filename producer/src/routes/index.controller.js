@@ -27,8 +27,8 @@ async function sending(req, res) {
             await channel.assertQueue('user', { durable: true })
             sendingAmqplib(channel, i)
             i++
-            // } while (i !== 0)
-        } while (i < 10)
+        } while (i !== 0)
+        // } while (i < 10)
 
         res.status(200).json({
             status: 200,
