@@ -56,7 +56,6 @@ function sendingAmqplib(channel, i) {
     }
 
     setTimeout(() => {
-        // channel.sendToQueue('user', Buffer.from(JSON.stringify(data)))
         channel.sendToQueue('user', Buffer.from(JSON.stringify(data)), {}, (err) => {
             if (err) {
                 fs.writeFile(
