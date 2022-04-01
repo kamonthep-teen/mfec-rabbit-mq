@@ -1,6 +1,7 @@
 const rabbit = require('amqplib')
-const { faker } = require('@faker-js/faker')
 const fs = require('fs')
+
+const { data } = require('./../models/index.model')
 
 //api sending message
 async function sending(req, res) {
@@ -45,16 +46,6 @@ async function sending(req, res) {
 
 // send message to amqplib
 function sendingAmqplib(channel, i) {
-    let data = {
-        id: i,
-        firstname: faker.name.firstName(),
-        lastname: faker.name.lastName(),
-        phonenumber: faker.phone.phoneNumber(),
-        city: faker.address.city(),
-        state: faker.address.state(),
-        country: faker.address.country(),
-    }
-
     setTimeout(() => {
         channel.sendToQueue('user', Buffer.from(JSON.stringify(data)), {}, (err) => {
             if (err) {
